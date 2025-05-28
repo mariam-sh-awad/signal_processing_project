@@ -1,16 +1,498 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>image filters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع التعديل على الصور</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+    
+       
+        .loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+  
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #4a6491);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+        }
+
+        .upload-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .image-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-area {
+            width: 100%;
+            height: 250px;
+            border: 3px dashed #3498db;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+        }
+
+        .upload-area:hover {
+            background: #e3f2fd;
+            border-color: #2980b9;
+        }
+
+        .upload-area i {
+            font-size: 70px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            font-size: 1.2rem;
+            color: #555;
+            text-align: center;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 14px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #2980b9, #2573a7);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.5);
+        }
+
+        .btn-gray {
+            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+            color: white;
+            box-shadow: 0 4px 10px rgba(149, 165, 166, 0.4);
+        }
+
+        .btn-gray:hover {
+            background: linear-gradient(45deg, #7f8c8d, #6c7a7d);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(149, 165, 166, 0.5);
+        }
+
+        .image-container {
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 25px;
+            position: relative;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+
+        .placeholder-text {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #555;
+            font-size: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: rise 10s infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% {
+                bottom: -100px;
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(100px);
+            }
+            100% {
+                bottom: 1080px;
+                transform: translateX(-200px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to EDMG</h1>
-    <p>upload your photo and let the magic begin!</p>
+    <!-- فقاعات متحركة للخلفية -->
+    <div class="bubbles"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-camera-retro"></i> مشروع مخبر معالجة الاشارة</h1>
+            <p>قم بتحميل صورتك لتحويلها إلى صورة باللونين الأبيض والأسود بجودة عالية</p>
+        </div>
+        
+        <div class="content">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>انقر أو اسحب الصورة هنا للتحميل</p>
+                </div>
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="convertBtn">
+                        <i class="fas fa-magic"></i> تحويل إلى أبيض وأسود
+                    </button>
+                    <button class="btn btn-secondary" id="downloadBtn">
+                        <i class="fas fa-download"></i> تنزيل الصورة
+                    </button>
+                    <button class="btn btn-gray" id="resetBtn">
+                        <i class="fas fa-redo"></i> بدء من جديد
+                    </button>
+                </div>
+            </div>
+            
+            <div class="image-section">
+                <div class="image-container">
+                    <p class="placeholder-text">سيتم عرض صورتك هنا بعد التحويل</p>
+                    <img id="originalImage" alt="الصورة الأصلية">
+                    <canvas id="canvas"></canvas>
+                </div>
+                
+                <div class="info">
+                    <h3><i class="fas fa-info-circle"></i> التعليمات:</h3>
+                    <ol>
+                        <li>قم بتحميل صورة باستخدام الزر بالأعلى</li>
+                        <li>انقر على "تحويل إلى أبيض وأسود"</li>
+                        <li>استخدم زر "تنزيل الصورة" لحفظ صورتك الجديدة</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>تم تصميم الموقع من قبل المهندسة العظيمة مريوم</p>
+        </div>
+    </div>
 
-    <form method="POST" action="/upload" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/*" required>
-        <button type="submit">upload</button>
-    </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // إنشاء فقاعات متحركة للخلفية
+            const bubblesContainer = document.querySelector('.bubbles');
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                const size = Math.random() * 80 + 20;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.animationDuration = `${Math.random() * 6 + 10}s`;
+                bubble.style.animationDelay = `${Math.random() * 5}s`;
+                bubblesContainer.appendChild(bubble);
+            }
+            
+            // العناصر الأساسية في الصفحة
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const convertBtn = document.getElementById('convertBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const originalImage = document.getElementById('originalImage');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // متغير لحفظ الصورة الأصلية
+            let originalImageData = null;
+            
+            // إعداد منطقة السحب والإفلات
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '#e3f2fd';
+                uploadArea.style.borderColor = '#2980b9';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.backgroundColor = '#f8f9fa';
+                uploadArea.style.borderColor = '#3498db';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '#f8f9fa';
+                uploadArea.style.borderColor = '#3498db';
+                
+                if (e.dataTransfer.files.length) {
+                    handleImageUpload(e.dataTransfer.files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleImageUpload(e.target.files[0]);
+                }
+            });
+            
+            // معالجة تحميل الصورة
+            function handleImageUpload(file) {
+                if (!file.type.match('image.*')) {
+                    alert('الرجاء تحميل ملف صورة فقط!');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    originalImage.src = e.target.result;
+                    originalImage.onload = function() {
+                        originalImage.style.display = 'block';
+                        
+                        // حفظ الصورة الأصلية للمعالجة
+                        canvas.width = originalImage.width;
+                        canvas.height = originalImage.height;
+                        ctx.drawImage(originalImage, 0, 0);
+                        originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        
+                        // إخفاء العنصر النائب
+                        document.querySelector('.placeholder-text').style.display = 'none';
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // تحويل الصورة إلى أبيض وأسود
+            convertBtn.addEventListener('click', function() {
+                if (!originalImageData) {
+                    alert('الرجاء تحميل صورة أولاً!');
+                    return;
+                }
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                // تحويل كل بكسل إلى أبيض وأسود
+                for (let i = 0; i < data.length; i += 4) {
+                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = avg;     // الأحمر
+                    data[i + 1] = avg; // الأخضر
+                    data[i + 2] = avg; // الأزرق
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+                canvas.style.display = 'block';
+                originalImage.style.display = 'none';
+                
+                // تمكين زر التنزيل
+                downloadBtn.disabled = false;
+            });
+            
+            // تنزيل الصورة المحولة
+            downloadBtn.addEventListener('click', function() {
+                if (canvas.style.display !== 'block') {
+                    alert('لا توجد صورة محولة للتنزيل!');
+                    return;
+                }
+                
+                const link = document.createElement('a');
+                link.download = 'صورة-ابيض-واسود.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+            
+            // إعادة تعيين الصفحة
+            resetBtn.addEventListener('click', function() {
+                fileInput.value = '';
+                originalImage.src = '';
+                originalImage.style.display = 'none';
+                canvas.style.display = 'none';
+                document.querySelector('.placeholder-text').style.display = 'block';
+                downloadBtn.disabled = true;
+                originalImageData = null;
+            });
+        });
+    </script>
 </body>
 </html>
