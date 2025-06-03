@@ -3,496 +3,771 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع التعديل على الصور</title>
+    <title>نظام معالجة الصور المتقدم</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+           --primary: #820055;
+            --primary-dark: #9087C0;
+            --secondary: #ec89f5;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --success: #28a776;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #f9f9f9 0%, #e6f4ff 100%);
+            color: var(--dark);
+            direction: rtl;
             min-height: 100vh;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
+            padding-bottom: 40px;
         }
-    
-       
-        .loading {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 10;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-  
-
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
+        
         .container {
-            width: 100%;
-            max-width: 900px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
-
-        .header {
-            background: linear-gradient(45deg, #2c3e50, #4a6491);
+        
+        /* Header */
+        header {
+            background: linear-gradient(120deg, var(--primary), var(--secondary));
             color: white;
+            padding: 25px 0;
             text-align: center;
-            padding: 30px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             position: relative;
+            overflow: hidden;
+            margin-bottom: 40px;
         }
-
-        .header h1 {
-            font-size: 2.5rem;
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
             margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-
-        .header p {
+        
+        header p {
             font-size: 1.2rem;
             opacity: 0.9;
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
-
-        .content {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 30px;
-        }
-
+        
+        /* Upload Section */
         .upload-section {
-            flex: 1;
-            min-width: 300px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-
-        .image-section {
-            flex: 1;
-            min-width: 300px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        
+        .upload-section:hover {
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         }
-
-        .upload-area {
-            width: 100%;
-            height: 250px;
-            border: 3px dashed #3498db;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
+        
+        .upload-section h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
             margin-bottom: 25px;
-            background: #f8f9fa;
+            position: relative;
+            display: inline-block;
         }
-
-        .upload-area:hover {
-            background: #e3f2fd;
-            border-color: #2980b9;
+        
+        .upload-section h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 60%;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
         }
-
-        .upload-area i {
-            font-size: 70px;
-            color: #3498db;
+        
+        .upload-container {
+            border: 3px dashed #d1e7ff;
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            background: #f8fbff;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .upload-container:hover {
+            border-color: var(--secondary);
+            background: #edf7ff;
+        }
+        
+        .upload-container i {
+            font-size: 5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+        
+        .upload-container:hover i {
+            transform: translateY(-5px);
+            opacity: 1;
+        }
+        
+        .upload-container h3 {
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .upload-container p {
+            color: var(--gray);
             margin-bottom: 15px;
         }
-
-        .upload-area p {
-            font-size: 1.2rem;
-            color: #555;
-            text-align: center;
-        }
-
+        
         .file-input {
             display: none;
         }
-
-        .controls {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        
+        .file-label {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
         }
-
-        .btn {
-            padding: 14px 25px;
-            font-size: 1.1rem;
+        
+        .file-label:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 119, 182, 0.4);
+        }
+        
+        .process-btn {
+            background: linear-gradient(120deg, var(--secondary), var(--primary));
+            color: white;
             border: none;
+            padding: 16px 45px;
+            font-size: 1.1rem;
+            font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
+            transition: var(--transition);
+            box-shadow: 0 5px 18px rgba(0, 180, 216, 0.4);
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
-            font-weight: 600;
+            margin: 20px 5px;
         }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            color: white;
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        
+        .process-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 22px rgba(0, 180, 216, 0.5);
         }
-
-        .btn-primary:hover {
-            background: linear-gradient(45deg, #2980b9, #2573a7);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5);
+        
+        .process-btn:active {
+            transform: translateY(0);
         }
-
-        .btn-secondary {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+        
+        .process-btn.gray {
+            background: linear-gradient(120deg, #6c757d, #495057);
         }
-
-        .btn-secondary:hover {
-            background: linear-gradient(45deg, #c0392b, #a93226);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.5);
+        
+        .process-btn.equalize {
+            background: linear-gradient(120deg, #ff9e80, #ff7043);
         }
-
-        .btn-gray {
-            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
-            color: white;
-            box-shadow: 0 4px 10px rgba(149, 165, 166, 0.4);
+        
+        .process-btn.blur {
+            background: linear-gradient(120deg, #90caf9, #42a5f5);
         }
-
-        .btn-gray:hover {
-            background: linear-gradient(45deg, #7f8c8d, #6c7a7d);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(149, 165, 166, 0.5);
+        
+        .process-btn.sharpen {
+            background: linear-gradient(120deg, #f48fb1, #ec407a);
         }
-
-        .image-container {
-            width: 100%;
-            height: 300px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            margin-bottom: 25px;
-            position: relative;
-            background: #f0f0f0;
+        
+        /* Preview Section */
+        .preview-section {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .preview-box {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            text-align: center;
+            min-width: 300px;
+            max-width: 100%;
+            flex: 1;
+        }
+        
+        .preview-box h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(45deg, #f1f9ff, #e1f0ff);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .image-preview i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            opacity: 0.3;
+        }
+        
+        /* Results Section */
+        .results-section {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 120px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .result-container {
+            display: flex;
+            flex-direction: column;
             align-items: center;
         }
-
-        .image-container img {
-            max-width: 100%;
-            max-height: 100%;
-            display: none;
-        }
-
-        canvas {
-            max-width: 100%;
-            max-height: 100%;
-            display: none;
-        }
-
-        .placeholder-text {
-            color: #7f8c8d;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
+        
+        .result-image {
+            width: 100%;
+            max-width: 500px;
+            height: 350px;
             background: #f8f9fa;
-            color: #555;
-            font-size: 1rem;
-            border-top: 1px solid #eee;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            border: 2px dashed #d1e7ff;
+            overflow: hidden;
         }
-
-        .bubbles {
-            position: absolute;
+        
+        .result-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .result-image i {
+            font-size: 5rem;
+            color: var(--primary);
+            opacity: 0.2;
+        }
+        
+        .result-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .result-info h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .result-info p {
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            border: none;
+        }
+        
+        .action-btn.download {
+            background: linear-gradient(120deg, var(--secondary), var(--primary));
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 180, 216, 0.4);
+        }
+        
+        .action-btn.download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 180, 216, 0.5);
+        }
+        
+        .action-btn.reset {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .action-btn.reset:hover {
+            background: #f0f8ff;
+            transform: translateY(-3px);
+        }
+        
+        /* Processing Animation */
+        .processing-overlay {
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
         }
-
-        .bubble {
-            position: absolute;
-            bottom: -100px;
-            background: rgba(255, 255, 255, 0.1);
+        
+        .processing-content {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f0f0f0;
+            border-top: 5px solid var(--primary);
             border-radius: 50%;
-            animation: rise 10s infinite ease-in;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
-
-        @keyframes rise {
-            0% {
-                bottom: -100px;
-                transform: translateX(0);
-            }
-            50% {
-                transform: translateX(100px);
-            }
-            100% {
-                bottom: 1080px;
-                transform: translateX(-200px);
-            }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
+        
+        /* Error Message */
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 25px 0;
+            text-align: center;
+            font-weight: 500;
+            border-left: 4px solid #c62828;
+            display: none;
+        }
+        
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .content {
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .upload-section {
+                padding: 30px 20px;
+            }
+            
+            .preview-section {
                 flex-direction: column;
             }
             
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .btn {
-                padding: 12px 20px;
-                font-size: 1rem;
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- فقاعات متحركة للخلفية -->
-    <div class="bubbles"></div>
-    
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-camera-retro"></i> مشروع مخبر معالجة الاشارة</h1>
-            <p>قم بتحميل صورتك لتحويلها إلى صورة باللونين الأبيض والأسود بجودة عالية</p>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-camera-retro"></i> نظام معالجة الصور المتقدم</h1>
+            <p>اختر نوع المعالجة المطلوبة لتحصل على النتيجة التي تريدها</p>
         </div>
-        
-        <div class="content">
-            <div class="upload-section">
-                <div class="upload-area" id="uploadArea">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>انقر أو اسحب الصورة هنا للتحميل</p>
-                </div>
-                <input type="file" id="fileInput" class="file-input" accept="image/*">
+    </header>
+
+    <div class="container">
+        <section class="upload-section">
+            <h2>اختر الصورة المراد معالجتها</h2>
+            <div class="upload-container" id="dropZone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>اسحب وأفلت الصورة هنا</h3>
+                <p>أو انقر لاختيار صورة من جهازك</p>
+                <p>الصيغ المدعومة: JPG, PNG, GIF (الحد الأقصى: 5MB)</p>
+            </div>
+            
+            <form id="imageForm">
+                <input type="file" name="image" id="image" class="file-input" accept="image/*" required>
+                <label for="image" class="file-label">
+                    <i class="fas fa-folder-open"></i> اختر صورة
+                </label>
                 
-                <div class="controls">
-                    <button class="btn btn-primary" id="convertBtn">
-                        <i class="fas fa-magic"></i> تحويل إلى أبيض وأسود
-                    </button>
-                    <button class="btn btn-secondary" id="downloadBtn">
-                        <i class="fas fa-download"></i> تنزيل الصورة
-                    </button>
-                    <button class="btn btn-gray" id="resetBtn">
-                        <i class="fas fa-redo"></i> بدء من جديد
-                    </button>
+                <div class="error-message" id="errorMessage">
+                    حدث خطأ! الرجاء اختيار صورة صالحة بحجم أقل من 5MB.
+                </div>
+            </form>
+            
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <div class="preview-box">
+                    <h3>الصورة الأصلية</h3>
+                    <div class="image-preview" id="originalPreview">
+                        <i class="fas fa-image"></i>
+                    </div>
                 </div>
             </div>
             
-            <div class="image-section">
-                <div class="image-container">
-                    <p class="placeholder-text">سيتم عرض صورتك هنا بعد التحويل</p>
-                    <img id="originalImage" alt="الصورة الأصلية">
-                    <canvas id="canvas"></canvas>
-                </div>
-                
-                <div class="info">
-                    <h3><i class="fas fa-info-circle"></i> التعليمات:</h3>
-                    <ol>
-                        <li>قم بتحميل صورة باستخدام الزر بالأعلى</li>
-                        <li>انقر على "تحويل إلى أبيض وأسود"</li>
-                        <li>استخدم زر "تنزيل الصورة" لحفظ صورتك الجديدة</li>
-                    </ol>
+            <div id="processingOptions" style="display: none; margin-top: 30px;">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">اختر نوع المعالجة</h2>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+                    <button class="process-btn gray" data-type="gray">
+                        <i class="fas fa-moon"></i> تحويل إلى رمادي
+                    </button>
+                    <button class="process-btn equalize" data-type="equalize">
+                        <i class="fas fa-sun"></i> تحسين التباين
+                    </button>
+                    <button class="process-btn blur" data-type="blur">
+                        <i class="fas fa-blur"></i> تنعيم الصورة
+                    </button>
+                    <button class="process-btn sharpen" data-type="sharpen">
+                        <i class="fas fa-bolt"></i> زيادة الحدة
+                    </button>
                 </div>
             </div>
-        </div>
+        </section>
         
-        <div class="footer">
-            <p>تم تصميم الموقع من قبل المهندسة العظيمة مريوم</p>
+        <section class="results-section" id="resultsSection">
+            <h2 class="section-title">نتيجة المعالجة</h2>
+            <div class="result-container">
+                <div class="result-image" id="resultImage">
+                    <i class="fas fa-image"></i>
+                </div>
+                
+                <div class="result-info">
+                    <h4>تفاصيل المعالجة</h4>
+                    <p id="processType">النوع: تحويل إلى رمادي</p>
+                    <p id="processTime">الوقت المستغرق: 0.75 ثانية</p>
+                    <p id="imageSize">الحجم: 350 كيلوبايت</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn download">
+                        <i class="fas fa-download"></i> تحميل الصورة
+                    </button>
+                    <button class="action-btn reset" id="resetBtn">
+                        <i class="fas fa-redo"></i> بدء معالجة جديدة
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-content">
+            <div class="spinner"></div>
+            <h2>جاري معالجة الصورة</h2>
+            <p>يرجى الانتظار، هذه العملية قد تستغرق بضع ثوانٍ...</p>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // إنشاء فقاعات متحركة للخلفية
-            const bubblesContainer = document.querySelector('.bubbles');
-            for (let i = 0; i < 20; i++) {
-                const bubble = document.createElement('div');
-                bubble.classList.add('bubble');
-                const size = Math.random() * 80 + 20;
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                bubble.style.left = `${Math.random() * 100}%`;
-                bubble.style.animationDuration = `${Math.random() * 6 + 10}s`;
-                bubble.style.animationDelay = `${Math.random() * 5}s`;
-                bubblesContainer.appendChild(bubble);
-            }
+        // عناصر DOM
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('image');
+        const errorMessage = document.getElementById('errorMessage');
+        const originalPreview = document.getElementById('originalPreview');
+        const previewSection = document.getElementById('previewSection');
+        const processingOptions = document.getElementById('processingOptions');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultImage = document.getElementById('resultImage');
+        const processType = document.getElementById('processType');
+        const resetBtn = document.getElementById('resetBtn');
+        const processingOverlay = document.getElementById('processingOverlay');
+        
+        // متغيرات التطبيق
+        let uploadedImage = null;
+        let processedImage = null;
+        
+        // دالة لعرض رسالة الخطأ
+        function showError(message) {
+            errorMessage.textContent = message || 'حدث خطأ! الرجاء اختيار صورة صالحة بحجم أقل من 5MB.';
+            errorMessage.style.display = 'block';
+            dropZone.style.borderColor = '#ff6b6b';
+            dropZone.style.backgroundColor = '#fff5f5';
+        }
+        
+        // دالة لإخفاء رسالة الخطأ
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+        
+        // دالة لعرض الصورة المختارة
+        function showImagePreview(file) {
+            const reader = new FileReader();
             
-            // العناصر الأساسية في الصفحة
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-            const convertBtn = document.getElementById('convertBtn');
-            const downloadBtn = document.getElementById('downloadBtn');
-            const resetBtn = document.getElementById('resetBtn');
-            const originalImage = document.getElementById('originalImage');
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
+            reader.onload = function(e) {
+                originalPreview.innerHTML = `<img src="${e.target.result}" alt="الصورة الأصلية">`;
+                uploadedImage = e.target.result;
+                previewSection.style.display = 'flex';
+                processingOptions.style.display = 'block';
+            };
             
-            // متغير لحفظ الصورة الأصلية
-            let originalImageData = null;
+            reader.readAsDataURL(file);
+        }
+        
+        // دالة لمحاكاة معالجة الصورة
+        function processImage(type) {
+            // إظهار شاشة التحميل
+            processingOverlay.style.display = 'flex';
             
-            // إعداد منطقة السحب والإفلات
-            uploadArea.addEventListener('click', () => fileInput.click());
-            
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '#e3f2fd';
-                uploadArea.style.borderColor = '#2980b9';
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.backgroundColor = '#f8f9fa';
-                uploadArea.style.borderColor = '#3498db';
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '#f8f9fa';
-                uploadArea.style.borderColor = '#3498db';
+            // محاكاة زمن المعالجة
+            setTimeout(() => {
+                // إخفاء شاشة التحميل
+                processingOverlay.style.display = 'none';
                 
-                if (e.dataTransfer.files.length) {
-                    handleImageUpload(e.dataTransfer.files[0]);
-                }
-            });
-            
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length) {
-                    handleImageUpload(e.target.files[0]);
-                }
-            });
-            
-            // معالجة تحميل الصورة
-            function handleImageUpload(file) {
-                if (!file.type.match('image.*')) {
-                    alert('الرجاء تحميل ملف صورة فقط!');
-                    return;
-                }
+                // عرض النتيجة
+                resultsSection.style.display = 'block';
                 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    originalImage.src = e.target.result;
-                    originalImage.onload = function() {
-                        originalImage.style.display = 'block';
-                        
-                        // حفظ الصورة الأصلية للمعالجة
-                        canvas.width = originalImage.width;
-                        canvas.height = originalImage.height;
-                        ctx.drawImage(originalImage, 0, 0);
-                        originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                        
-                        // إخفاء العنصر النائب
-                        document.querySelector('.placeholder-text').style.display = 'none';
-                    };
+                // تعبئة معلومات المعالجة
+                const processTypes = {
+                    gray: 'تحويل إلى رمادي',
+                    equalize: 'تحسين التباين',
+                    blur: 'تنعيم الصورة',
+                    sharpen: 'زيادة الحدة'
                 };
-                reader.readAsDataURL(file);
+                
+                const processTimes = {
+                    gray: (Math.random() * 0.5 + 0.3).toFixed(2),
+                    equalize: (Math.random() * 0.8 + 0.5).toFixed(2),
+                    blur: (Math.random() * 1.0 + 0.7).toFixed(2),
+                    sharpen: (Math.random() * 0.9 + 0.6).toFixed(2)
+                };
+                
+                const imageSizes = {
+                    gray: '250 كيلوبايت',
+                    equalize: '280 كيلوبايت',
+                    blur: '320 كيلوبايت',
+                    sharpen: '300 كيلوبايت'
+                };
+                
+                processType.textContent = `النوع: ${processTypes[type]}`;
+                document.getElementById('processTime').textContent = `الوقت المستغرق: ${processTimes[type]} ثانية`;
+                document.getElementById('imageSize').textContent = `الحجم: ${imageSizes[type]}`;
+                
+                // إضافة الصورة المعالجة (في تطبيق حقيقي، ستكون هذه الصورة من الخادم)
+                resultImage.innerHTML = `
+                    <img src="${uploadedImage}" alt="الصورة المعالجة" style="filter: ${getFilterByType(type)}">
+                `;
+                
+                // تعيين الصورة المعالجة (لأغراض التحميل)
+                processedImage = uploadedImage;
+            }, 2000);
+        }
+        
+        // دالة للحصول على فلتر CSS حسب نوع المعالجة (لأغراض العرض فقط)
+        function getFilterByType(type) {
+            const filters = {
+                gray: 'grayscale(100%)',
+                equalize: 'contrast(130%) brightness(110%)',
+                blur: 'blur(3px)',
+                sharpen: 'contrast(120%) saturate(150%)'
+            };
+            return filters[type] || 'none';
+        }
+        
+        // دالة لإعادة تعيين النموذج
+        function resetForm() {
+            fileInput.value = '';
+            previewSection.style.display = 'none';
+            processingOptions.style.display = 'none';
+            resultsSection.style.display = 'none';
+            originalPreview.innerHTML = '<i class="fas fa-image"></i>';
+            resultImage.innerHTML = '<i class="fas fa-image"></i>';
+            dropZone.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>اسحب وأفلت الصورة هنا</h3>
+                <p>أو انقر لاختيار صورة من جهازك</p>
+                <p>الصيغ المدعومة: JPG, PNG, GIF (الحد الأقصى: 5MB)</p>
+            `;
+            dropZone.style.borderColor = '#d1e7ff';
+            dropZone.style.backgroundColor = '#f8fbff';
+            uploadedImage = null;
+            processedImage = null;
+            hideError();
+        }
+        
+        // أحداث السحب والإفلات
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#0077b6';
+            dropZone.style.backgroundColor = '#e1f0ff';
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#d1e7ff';
+            dropZone.style.backgroundColor = '#f8fbff';
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#d1e7ff';
+            dropZone.style.backgroundColor = '#f8fbff';
+            
+            if (e.dataTransfer.files.length) {
+                const file = e.dataTransfer.files[0];
+                
+                if (file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024) {
+                    fileInput.files = e.dataTransfer.files;
+                    showImagePreview(file);
+                    hideError();
+                } else {
+                    showError();
+                }
             }
-            
-            // تحويل الصورة إلى أبيض وأسود
-            convertBtn.addEventListener('click', function() {
-                if (!originalImageData) {
-                    alert('الرجاء تحميل صورة أولاً!');
-                    return;
+        });
+        
+        // حدث تغيير ملف الإدخال
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                const file = fileInput.files[0];
+                
+                if (file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024) {
+                    showImagePreview(file);
+                    hideError();
+                } else {
+                    showError();
                 }
-                
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imageData.data;
-                
-                // تحويل كل بكسل إلى أبيض وأسود
-                for (let i = 0; i < data.length; i += 4) {
-                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                    data[i] = avg;     // الأحمر
-                    data[i + 1] = avg; // الأخضر
-                    data[i + 2] = avg; // الأزرق
-                }
-                
-                ctx.putImageData(imageData, 0, 0);
-                canvas.style.display = 'block';
-                originalImage.style.display = 'none';
-                
-                // تمكين زر التنزيل
-                downloadBtn.disabled = false;
-            });
-            
-            // تنزيل الصورة المحولة
-            downloadBtn.addEventListener('click', function() {
-                if (canvas.style.display !== 'block') {
-                    alert('لا توجد صورة محولة للتنزيل!');
-                    return;
-                }
-                
-                const link = document.createElement('a');
-                link.download = 'صورة-ابيض-واسود.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
-            
-            // إعادة تعيين الصفحة
-            resetBtn.addEventListener('click', function() {
-                fileInput.value = '';
-                originalImage.src = '';
-                originalImage.style.display = 'none';
-                canvas.style.display = 'none';
-                document.querySelector('.placeholder-text').style.display = 'block';
-                downloadBtn.disabled = true;
-                originalImageData = null;
+            }
+        });
+        
+        // أحداث أزرار المعالجة
+        document.querySelectorAll('.process-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const processType = button.getAttribute('data-type');
+                processImage(processType);
             });
         });
+        
+        // حدث زر التحميل
+        document.querySelector('.action-btn.download').addEventListener('click', () => {
+            if (processedImage) {
+                // في تطبيق حقيقي، سيتم تنزيل الصورة من الخادم
+                alert('سيبدأ تنزيل الصورة المعالجة في التطبيق الحقيقي');
+            } else {
+                alert('لا توجد صورة معالجة للتحميل');
+            }
+        });
+        
+        // حدث إعادة التعيين
+        resetBtn.addEventListener('click', resetForm);
     </script>
 </body>
 </html>
